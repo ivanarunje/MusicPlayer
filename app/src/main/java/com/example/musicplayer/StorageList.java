@@ -14,6 +14,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
+
 import java.util.ArrayList;
 
 public class StorageList extends AppCompatActivity {
@@ -39,8 +41,9 @@ public class StorageList extends AppCompatActivity {
         ContentResolver contentResolver = getContentResolver();
         Cursor cursor = contentResolver.query(filename, null, null, null, null);
 
-        if (checkPermission()) {
+        if (checkStoragePermission()) {
             readDataFromStorage(cursor);
+            checkAudioPermission();
         }
 
 
@@ -82,11 +85,20 @@ public class StorageList extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private boolean checkPermission() {
-        if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+    private boolean checkStoragePermission() {
+        if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
             return true;
         } else {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO}, 0);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+            return false;
+        }
+    }
+
+    private boolean checkAudioPermission() {
+        if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+            return true;
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 2);
             return false;
         }
     }
@@ -95,19 +107,30 @@ public class StorageList extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
-            case 0:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            case 1:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     ContentResolver contentResolver = getContentResolver();
                     Cursor cursor = contentResolver.query(filename, null, null, null, null);
                     readDataFromStorage(cursor);
+                    checkAudioPermission();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Storage permission needed... EXIT APP!", Toast.LENGTH_SHORT).show();
+                    this.finishAffinity();
                 }
-                if (grantResults[1] == PackageManager.PERMISSION_DENIED) {
-                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 3);
-                }
-                break;
-            case 3:
-                break;
 
+                break;
+            case 2:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // continue execution
+                }
+                else {
+                    Toast.makeText(getApplicationContext(), "Audio permission needed... EXIT APP!", Toast.LENGTH_SHORT).show();
+                    this.finishAffinity();
+                }
+
+                break;
+            default:
+                return;
         }
     }
 }

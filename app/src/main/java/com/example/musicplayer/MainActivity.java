@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private SeekBar seekBar;
     private MediaPlayer player;
     private Handler myHandler;
-    private Interpreter tflite;
+    private Interpreter interpreter;
     private JLibrosa jLibrosa;
     private WaveRecorder wr;
 
@@ -86,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         seekBar.setMax(player.getDuration());
         myHandler = new Handler();
         myHandler.postDelayed(UpdateSongTime,100);
+        start();
 
         for (ImageButton imageButton : Arrays.asList(btnPrevious, btnNext, btnStart, btnForward, btnBackward, btnPlaylist)) {
             imageButton.setOnClickListener(this);
@@ -95,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         jLibrosa = new JLibrosa();
 
         try {
-            tflite = new Interpreter(loadModelFile(), null);
+            interpreter = new Interpreter(loadModelFile(), null);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -173,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void selectSong(int prevOrNext)
     {
         int newIndex = 0;
-        player.stop();
+
         String newPath = "";
         for (int i=0; i<dataList.size(); i++){
 
@@ -193,8 +194,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
         current = newPath;
-        tvSongName.setText(current.substring(current.lastIndexOf("/") + 1).trim());
+        player.stop();
         player.reset();
+        tvSongName.setText(current.substring(current.lastIndexOf("/") + 1).trim());
+
         try {
             player.setDataSource(newPath);
             player.prepare();
@@ -293,16 +296,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void predictLabel(float[][] mfccValues){
         DecimalFormat df = new DecimalFormat("#.##");
-        float[][][][] input2 = new float[1][32][13][1];
+        float[][][][] input = new float[1][32][13][1];
 
         for(int i=0; i<32;i++){
             for (int j=0;j<13;j++)
             {
-                input2[0][i][j][0]=mfccValues[j][i];
+                input[0][i][j][0]=mfccValues[j][i];
             }
         }
         float[][] output = new float[1][6];
-        tflite.run(input2,output);
+        interpreter.run(input, output);
         Log.d("TEST", "******** - PREDICTIONS - *****");
         for(int i=0;i<6;i++)
             Log.d("TEST", modelLabels[i]+" - " + df.format((output[0][i] * 100))+ " %");
@@ -350,5 +353,4 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
         }
     }
-
 }
