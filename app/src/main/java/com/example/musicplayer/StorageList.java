@@ -17,10 +17,15 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class StorageList extends AppCompatActivity {
 
     private ArrayList<String> nameList, pathList;
+    private Map<String, String> songs, sortedMap;
     private ListView listview;
     private Uri filename;
     private String name, path;
@@ -32,9 +37,7 @@ public class StorageList extends AppCompatActivity {
         setContentView(R.layout.activity_storage_list);
 
         listview = findViewById(R.id.music_list);
-        nameList = new ArrayList<>();
-        pathList = new ArrayList<>();
-
+        songs = new HashMap<>();
 
         filename = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
 
@@ -69,11 +72,16 @@ public class StorageList extends AppCompatActivity {
                 path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
 
                 if (path.endsWith(".mp3") || path.endsWith(".MP3")) {
-                    pathList.add(path);
-                    nameList.add(name);
+                    //pathList.add(path);
+                    //nameList.add(name);
+                    songs.put(name, path);
                 }
             } while (cursor.moveToNext());
         }
+        sortedMap = new TreeMap<>(songs);
+        nameList = new ArrayList<>(sortedMap.keySet());
+        pathList = new ArrayList<>(sortedMap.values());
+
         ArrayAdapter adapter = new ArrayAdapter(StorageList.this, R.layout.item, nameList);
         listview.setAdapter(adapter);
     }

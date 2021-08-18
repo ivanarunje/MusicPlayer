@@ -1,7 +1,9 @@
 package com.example.musicplayer;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
+import android.app.ActionBar;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
@@ -105,7 +107,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         filepath = cn.getExternalFilesDir(Environment.DIRECTORY_MUSIC).toString();
         wr = new WaveRecorder(filepath+"/record.wav");
 
-
         player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
@@ -124,6 +125,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) { }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        startNewActivity();
     }
 
     @Override
