@@ -3,7 +3,9 @@ package com.example.musicplayer;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.ContentResolver;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -14,8 +16,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
-
 import java.util.ArrayList;
 
 public class StorageList extends AppCompatActivity {
@@ -106,6 +106,8 @@ public class StorageList extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+
         switch (requestCode) {
             case 1:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -114,23 +116,38 @@ public class StorageList extends AppCompatActivity {
                     readDataFromStorage(cursor);
                     checkAudioPermission();
                 } else {
-                    Toast.makeText(getApplicationContext(), "Storage permission needed... EXIT APP!", Toast.LENGTH_SHORT).show();
-                    this.finishAffinity();
+                    showAlertDialog(1);
                 }
-
                 break;
+
             case 2:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // continue execution
                 }
                 else {
-                    Toast.makeText(getApplicationContext(), "Audio permission needed... EXIT APP!", Toast.LENGTH_SHORT).show();
-                    this.finishAffinity();
+                    showAlertDialog(2);
                 }
 
                 break;
             default:
                 return;
         }
+    }
+    public void showAlertDialog(int flag){
+
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        alertDialog.setIcon(R.drawable.warning).setTitle(R.string.permissionTitle);
+        if(flag==1){
+            alertDialog.setMessage(R.string.storage);
+        }else{
+            alertDialog.setMessage(R.string.audio);
+        }
+        alertDialog.setCancelable(false);
+        alertDialog.setPositiveButton(R.string.alertButton, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+                finishAffinity();
+            }
+        }).show();
     }
 }

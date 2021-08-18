@@ -43,11 +43,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private JLibrosa jLibrosa;
     private WaveRecorder wr;
 
-    private String current, predictedLabel;
+    private String current;
     private String filepath = "";
     private Integer startStop = 1;
     private ArrayList<String> dataList;
-    private Long start, finish;
+    private Long start;
 
     private static final Integer SELECT_NEXT = 1;
     private static final Integer SELECT_PREVIOUS = 2;
@@ -274,7 +274,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
 
             if (event.getAction() == MotionEvent.ACTION_UP) {
-                finish = System.currentTimeMillis();
+                Long finish = System.currentTimeMillis();
                 wr.stopRecording();
                 Toast.makeText(v.getContext(), "Rec finished!", Toast.LENGTH_SHORT).show();
                 if((finish - start)<1000){
@@ -309,8 +309,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Log.d("TEST", "******** - PREDICTIONS - *****");
         for(int i=0;i<6;i++)
             Log.d("TEST", modelLabels[i]+" - " + df.format((output[0][i] * 100))+ " %");
-        predictedLabel = getLabelString(output);
+
+        String predictedLabel = getLabelString(output);
         Log.d("TEST", "Predicted word =>  " + predictedLabel);
+
         micAction(predictedLabel.toLowerCase());
     }
 

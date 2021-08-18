@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">MusicPlayer</string>
     <string name="song_name">SONG NAME</string>
+    <string name="storage">Storage permission required!\nExiting app!</string>
+    <string name="audio">Audio permission required!\nExiting app!</string>
+    <string name="permissionTitle">Permission alert</string>
+    <string name="alertButton">OK</string>
+    <string name="time">00:00</string>
 </resources>

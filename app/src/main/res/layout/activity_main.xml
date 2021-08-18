@@ -39,7 +39,7 @@
                 android:layout_height="wrap_content"
                 android:paddingRight="10dp"
                 android:layout_marginLeft="7dp"
-                android:text="00:00"
+                android:text="@string/time"
                 android:textColor="@color/teal_dark" />
 
             <SeekBar
@@ -73,8 +73,7 @@
                 android:id="@+id/backward"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/backward"
-                android:text="ba" />
+                android:background="@drawable/backward" />
 
             <ImageButton
                 android:id="@+id/previous"
@@ -92,15 +91,13 @@
                 android:id="@+id/next"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/next"
-                android:text="next" />
+                android:background="@drawable/next" />
 
             <ImageButton
                 android:id="@+id/forward"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:background="@drawable/forward"
-                android:text="fo" />
+                android:background="@drawable/forward" />
         </LinearLayout>
 
         <LinearLayout
