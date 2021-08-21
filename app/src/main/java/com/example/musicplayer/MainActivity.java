@@ -1,9 +1,7 @@
 package com.example.musicplayer;
 
-import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
-import android.app.ActionBar;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
@@ -260,7 +258,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private MappedByteBuffer loadModelFile() throws IOException{
-        AssetFileDescriptor fileDescriptor = this.getAssets().openFd("modelTeachable800.tflite");
+        AssetFileDescriptor fileDescriptor = this.getAssets().openFd("model.tflite");
         FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
         FileChannel fileChannel = inputStream.getChannel();
         long startOffset = fileDescriptor.getStartOffset();
