@@ -47,7 +47,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private String filepath = "";
     private Integer startStop = 1;
     private ArrayList<String> dataList;
-    private Long start;
 
     private static final Integer SELECT_NEXT = 1;
     private static final Integer SELECT_PREVIOUS = 2;
@@ -271,22 +270,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (v.getId() == R.id.btnRecord) {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                start = System.currentTimeMillis();
                 wr.startRecording();
                 Toast.makeText(v.getContext(), "Rec started....", Toast.LENGTH_SHORT).show();
                 return true;
             }
 
             if (event.getAction() == MotionEvent.ACTION_UP) {
-                Long finish = System.currentTimeMillis();
                 wr.stopRecording();
-                Toast.makeText(v.getContext(), "Rec finished!", Toast.LENGTH_SHORT).show();
-                if((finish - start)<1000){
-                    Toast.makeText(v.getContext(), "Too short!", Toast.LENGTH_SHORT).show();
-                    return true;
-                }
+
                 try {
                     float[][] buff = jLibrosa.loadAndReadStereo(filepath + "/record.wav", 16000, 1);
+                    if (buff[0].length < 16000) {
+                        Toast.makeText(v.getContext(), "Command too short, at least 1 second of recording needed!", Toast.LENGTH_SHORT).show();
+                        return true;
+                    }
                     float[][] mfccValues = jLibrosa.generateMFCCFeatures(buff[0], 16000, 13);
                     predictLabel(mfccValues);
                 } catch (IOException | FileFormatNotSupportedException | WavFileException e) {
@@ -300,16 +297,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void predictLabel(float[][] mfccValues){
         DecimalFormat df = new DecimalFormat("#.##");
-        float[][][][] input = new float[1][32][13][1];
 
-        for(int i=0; i<32;i++){
-            for (int j=0;j<13;j++)
-            {
-                input[0][i][j][0]=mfccValues[j][i];
-            }
-        }
         float[][] output = new float[1][6];
-        interpreter.run(input, output);
+        interpreter.run(mfccValues, output);
         Log.d("TEST", "******** - PREDICTIONS - *****");
         for(int i=0;i<6;i++)
             Log.d("TEST", modelLabels[i]+" - " + df.format((output[0][i] * 100))+ " %");
